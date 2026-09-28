@@ -1,0 +1,32 @@
+name: Deploy
+
+# PRs (including Dependabot version bumps) validate this config against the pinned contact-api version without
+# touching AWS. Pushes to main deploy it, once the AWS_ROLE_ARN secret exists. Until then they only validate.
+
+# Deploys queue one at a time and are never interrupted mid-apply. PR checks get their own group, because a newer
+# queued run in the same group cancels an older queued one, and a PR would otherwise cancel a waiting deploy.
+concurrency:
+  group: ${{ github.event_name == 'pull_request' && format('validate-{0}', github.ref) || 'deploy' }}
+  cancel-in-progress: false
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  id-token: write # AWS OIDC
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: Unit2795/contact-api@v1.2.0
+        with:
+          apply: ${{ github.event_name != 'pull_request' && secrets.AWS_ROLE_ARN != '' }}
+          aws-role-arn: ${{ secrets.AWS_ROLE_ARN }}

@@ -1,0 +1,7 @@
+# Opens a PR when contact-api (or another action) ships a new tag. The PR validates this config against it.
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
