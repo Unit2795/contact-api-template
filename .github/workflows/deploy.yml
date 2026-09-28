@@ -24,9 +24,9 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
 
-      - uses: Unit2795/contact-api@v1.2.0
+      - uses: Unit2795/contact-api@v1.2.1
         with:
           apply: ${{ github.event_name != 'pull_request' && secrets.AWS_ROLE_ARN != '' }}
           aws-role-arn: ${{ secrets.AWS_ROLE_ARN }}
