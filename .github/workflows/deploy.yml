@@ -1,10 +1,10 @@
 name: Deploy
 
-# PRs (including Dependabot version bumps) validate this config against the pinned contact-api version without
-# touching AWS. Pushes to main deploy it, once the AWS_ROLE_ARN secret exists. Until then they only validate.
+# PRs (including Dependabot version bumps) validate this config against the pinned contact-api version without touching AWS.
+# Pushes to main and manual runs on main deploy it, once the AWS_ROLE_ARN secret exists. Until then they only validate.
 
-# Deploys queue one at a time and are never interrupted mid-apply. PR checks get their own group, because a newer
-# queued run in the same group cancels an older queued one, and a PR would otherwise cancel a waiting deploy.
+# Only one deploy runs at a time, and a newer run never cancels one that is in progress.
+# PR checks get their own group: in one group, a newly queued run cancels an older queued one, so a PR could otherwise cancel a waiting deploy.
 concurrency:
   group: ${{ github.event_name == 'pull_request' && format('validate-{0}', github.ref) || 'deploy' }}
   cancel-in-progress: false
